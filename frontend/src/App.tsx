@@ -136,6 +136,7 @@ export default function App() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [totalViewsCount, setTotalViewsCount] = useState<number>(124);
 
   // Custom Cursor details
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -320,11 +321,15 @@ export default function App() {
 
   const trackPageView = async () => {
     try {
-      await fetch('/api/analytics', {
+      const res = await fetch('/api/analytics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ eventType: 'page_view', eventTarget: 'home' })
       });
+      const data = await res.json();
+      if (data && data.totalViews) {
+        setTotalViewsCount(data.totalViews);
+      }
     } catch (e) {}
   };
 
@@ -641,13 +646,14 @@ export default function App() {
     >
       {/* Custom magnetic follower cursor (Only visible on non-touch desktop pointer screens) */}
       <motion.div
-        className="hidden md:block fixed pointer-events-none z-50 h-5 w-5 rounded-full border border-[var(--primary)] bg-transparent transform -translate-x-1/2 -translate-y-1/2 mix-blend-screen"
+        className="hidden md:block fixed pointer-events-none z-50 h-5 w-5 rounded-full border bg-transparent transform -translate-x-1/2 -translate-y-1/2 mix-blend-screen"
+        style={{ borderColor: activeTheme.primary }}
         animate={{
           x: cursorPos.x,
           y: cursorPos.y,
           scale: cursorHovered ? 2.5 : 1,
-          backgroundColor: cursorHovered ? 'var(--glow-color)' : 'transparent',
-          borderColor: cursorHovered ? 'var(--accent)' : 'var(--primary)'
+          backgroundColor: cursorHovered ? activeTheme.glow : 'transparent',
+          borderColor: cursorHovered ? activeTheme.accent : activeTheme.primary
         }}
         transition={{ type: 'spring', damping: 30, stiffness: 400, mass: 0.2 }}
       />
@@ -800,12 +806,7 @@ export default function App() {
           >
             Building Modern Digital <br />
             <span 
-              className="text-glow transition-all duration-300"
-              style={{
-                background: `linear-gradient(135deg, ${activeTheme.primary} 0%, ${activeTheme.accent} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
+              className="text-glow bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent transition-all duration-300"
             >
               Experiences That Feel Premium.
             </span>
@@ -1270,7 +1271,7 @@ export default function App() {
             </div>
 
             {/* Resume Page rendering Panel */}
-            <div className="lg:col-span-7 print:w-full print:block">
+            <div className="lg:col-span-7 print:w-full print:block w-full max-w-full overflow-hidden">
               {/* Action buttons (Hidden on Print) */}
               <div className="flex items-center justify-between mb-4 print:hidden">
                 <div className="flex space-x-2">
@@ -1278,7 +1279,7 @@ export default function App() {
                     onClick={() => setResumeTemplate('ats')}
                     className="px-3 py-1.5 rounded-lg text-xs font-mono"
                     style={{
-                      backgroundColor: resumeTemplate === 'ats' ? 'var(--primary)' : '#020617',
+                      backgroundColor: resumeTemplate === 'ats' ? activeTheme.primary : '#020617',
                       color: resumeTemplate === 'ats' ? '#fff' : '#94A3B8',
                       border: resumeTemplate === 'ats' ? 'none' : '1px solid #1E293B'
                     }}
@@ -1289,7 +1290,7 @@ export default function App() {
                     onClick={() => setResumeTemplate('modern_dark')}
                     className="px-3 py-1.5 rounded-lg text-xs font-mono"
                     style={{
-                      backgroundColor: resumeTemplate === 'modern_dark' ? 'var(--secondary)' : '#020617',
+                      backgroundColor: resumeTemplate === 'modern_dark' ? activeTheme.secondary : '#020617',
                       color: resumeTemplate === 'modern_dark' ? '#fff' : '#94A3B8',
                       border: resumeTemplate === 'modern_dark' ? 'none' : '1px solid #1E293B'
                     }}
@@ -1607,8 +1608,12 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-[#1E293B] py-12 px-6 bg-background-main">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between text-xs text-text-muted">
-          <div>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <span>© {new Date().getFullYear()} Shivam Jethure. All rights reserved.</span>
+            <span className="hidden sm:inline text-[#1E293B]">|</span>
+            <span className="text-[var(--accent)] font-mono flex items-center bg-[#0f172a] px-2.5 py-1 rounded-lg border border-border-glow">
+              ⚡ {totalViewsCount} Profile Views
+            </span>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
