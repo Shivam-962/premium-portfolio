@@ -852,7 +852,7 @@ export default function App() {
             className="mt-12 flex flex-wrap items-center justify-center gap-4 text-text-muted print:hidden"
           >
             <a 
-              href="https://github.com/shivamjethure" 
+              href="https://github.com/Shivam-962" 
               target="_blank" 
               rel="noreferrer" 
               className="hover:text-[var(--accent)] hover:scale-110 transform duration-200 flex items-center space-x-1 text-xs font-mono border border-border-glow bg-background-glass px-3 py-1.5 rounded-lg"

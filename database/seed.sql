@@ -104,7 +104,7 @@ INSERT INTO resumes (name, is_master, content) VALUES
       "phone": "+91 91751 41111",
       "location": "Maharashtra, India",
       "website": "https://shivamjethure.dev",
-      "github": "github.com/shivamjethure",
+      "github": "github.com/Shivam-962",
       "summary": "A Second Year B.Tech student passionate about technology, software development, and modern digital experiences. Dedicated to building responsive, user-friendly, and visually modern applications with real-world functionality. Currently learning Java, MySQL, Python, Prompt Engineering, and Vibe Coding."
     },
     "education": [
