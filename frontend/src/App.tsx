@@ -861,7 +861,7 @@ export default function App() {
               <span>Shivam Jethure GitHub</span>
             </a>
             <a 
-              href="https://www.linkedin.com/in/shivam-jethure" 
+              href="https://www.linkedin.com/in/shivam-jethure-2320b32b3" 
               target="_blank" 
               rel="noreferrer" 
               className="hover:text-[var(--accent)] hover:scale-110 transform duration-200 flex items-center space-x-1 text-xs font-mono border border-border-glow bg-background-glass px-3 py-1.5 rounded-lg"
