@@ -5,7 +5,7 @@ import {
   Download, Send, Lock, Github, Terminal, Sliders, Sparkles, 
   Trash2, Eye, BookOpen, Briefcase, Mail, CheckCircle, 
   BarChart2, Check, RefreshCw, X, ChevronUp, AlertCircle, Settings,
-  Menu
+  Menu, QrCode
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 
@@ -145,6 +145,12 @@ export default function App() {
   // Theme configuration state
   const [activeTheme, setActiveTheme] = useState(THEMES[0]);
   const [showThemePanel, setShowThemePanel] = useState(false);
+
+  // QR Profile Share Widget states
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const [isQrCopied, setIsQrCopied] = useState(false);
+  const [qrTilt, setQrTilt] = useState({ x: 0, y: 0 });
+  const qrDragRef = React.useRef<HTMLDivElement>(null);
 
   // Resume editor & analyzer states
   const [jdText, setJdText] = useState('');
@@ -694,6 +700,15 @@ export default function App() {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Share QR Trigger */}
+            <button
+              onClick={() => setIsQrOpen(true)}
+              className="p-2 rounded-xl border border-border-glow text-text-muted hover:text-white hover:border-[var(--primary)] transition-all duration-300"
+              title="Share Profile by QR Code"
+            >
+              <QrCode className="w-4 h-4 text-[var(--primary)] hover:scale-110 transition-transform" />
+            </button>
+
             {/* Theme Trigger cog */}
             <button
               onClick={() => setShowThemePanel(!showThemePanel)}
@@ -738,6 +753,15 @@ export default function App() {
                   <Sparkles className="w-4 h-4 mr-1 text-[var(--accent)] animate-pulse" /> AI Resume
                 </a>
                 <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">Contact</a>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsQrOpen(true);
+                  }}
+                  className="flex items-center space-x-2 rounded-xl border border-border-glow px-4 py-2.5 text-xs font-semibold text-text-muted hover:border-[var(--primary)] hover:text-white transition-all duration-300 w-full justify-center"
+                >
+                  <QrCode className="h-3.5 w-3.5 mr-1 text-[var(--primary)] animate-pulse" /> Share Profile
+                </button>
                 <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
@@ -1885,6 +1909,165 @@ export default function App() {
                   </div>
                 )}
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- Floating Zero-Gravity QR Share Modal --- */}
+      <AnimatePresence>
+        {isQrOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-[#020617]/70 backdrop-blur-md flex items-center justify-center p-4 overflow-hidden"
+          >
+            {/* Backdrop particles */}
+            {[1, 2, 3, 4].map((i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full pointer-events-none opacity-20 filter blur-xl"
+                style={{
+                  width: i * 40 + 60,
+                  height: i * 40 + 60,
+                  background: i % 2 === 0 ? activeTheme.primary : activeTheme.secondary,
+                }}
+                animate={{
+                  x: [0, i % 2 === 0 ? 120 : -120, 0],
+                  y: [0, i % 2 === 0 ? -100 : 100, 0],
+                  scale: [1, 1.25, 1],
+                }}
+                transition={{
+                  duration: 10 + i * 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
+
+            {/* Click backdrop to close */}
+            <div className="absolute inset-0 cursor-pointer" onClick={() => setIsQrOpen(false)} />
+
+            {/* Full-viewport boundary container for dragging */}
+            <div ref={qrDragRef} className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 overflow-hidden">
+              <motion.div
+                drag
+                dragConstraints={qrDragRef}
+                dragElastic={0.4}
+                dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
+                whileDrag={{ scale: 1.05, cursor: "grabbing" }}
+                className="pointer-events-auto"
+              >
+                {/* Float container to decouple bobbing animation from drag variables */}
+                <motion.div
+                  animate={{
+                    y: [0, -12, 0],
+                    rotate: [0, 0.5, -0.5, 0],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 5,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div
+                    onMouseMove={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const x = e.clientX - rect.left - rect.width / 2;
+                      const y = e.clientY - rect.top - rect.height / 2;
+                      const rotateX = -(y / (rect.height / 2)) * 12;
+                      const rotateY = (x / (rect.width / 2)) * 12;
+                      setQrTilt({ x: rotateX, y: rotateY });
+                    }}
+                    onMouseLeave={() => setQrTilt({ x: 0, y: 0 })}
+                    style={{
+                      transform: `perspective(1000px) rotateX(${qrTilt.x}deg) rotateY(${qrTilt.y}deg)`,
+                      transformStyle: "preserve-3d",
+                      borderColor: activeTheme.primary,
+                      boxShadow: `0 0 50px -10px ${activeTheme.glow}`,
+                      transition: 'transform 0.1s ease',
+                    }}
+                    className="w-full max-w-sm rounded-3xl bg-[#0b0f19]/90 border p-6 select-none relative overflow-hidden backdrop-blur-2xl flex flex-col items-center"
+                  >
+                    {/* Header */}
+                    <div className="w-full flex items-center justify-between mb-4" style={{ transform: "translateZ(30px)" }}>
+                      <span className="text-xs font-mono font-bold tracking-widest text-[var(--accent)] flex items-center">
+                        <Sparkles className="w-3.5 h-3.5 mr-1 text-[var(--accent)] animate-pulse" /> LIVE PORTFOLIO
+                      </span>
+                      <button
+                        onClick={() => setIsQrOpen(false)}
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-text-muted hover:text-white transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* QR Code Container */}
+                    <div
+                      className="relative p-4 bg-white rounded-2xl shadow-inner mb-4 transition-transform duration-300 hover:scale-105"
+                      style={{ transform: "translateZ(50px)" }}
+                    >
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=0f172a&data=${encodeURIComponent(window.location.href)}`}
+                        alt="Profile QR Code"
+                        className="w-44 h-44 select-none pointer-events-none"
+                      />
+                      {/* Scan Line */}
+                      <motion.div
+                        animate={{ y: [0, 176, 0] }}
+                        transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
+                        className="absolute left-4 right-4 h-0.5"
+                        style={{
+                          background: `linear-gradient(to right, transparent, ${activeTheme.primary}, transparent)`,
+                          boxShadow: `0 0 10px ${activeTheme.primary}`,
+                        }}
+                      />
+                      {/* Corner Decorations */}
+                      <div className="absolute top-1 left-1 w-4 h-4 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: activeTheme.primary }} />
+                      <div className="absolute top-1 right-1 w-4 h-4 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: activeTheme.primary }} />
+                      <div className="absolute bottom-1 left-1 w-4 h-4 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: activeTheme.primary }} />
+                      <div className="absolute bottom-1 right-1 w-4 h-4 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: activeTheme.primary }} />
+                    </div>
+
+                    {/* Text & URL Copy Section */}
+                    <div className="w-full space-y-3" style={{ transform: "translateZ(40px)" }}>
+                      <div className="text-center">
+                        <h4 className="text-white font-display font-extrabold text-lg">Scan or Share</h4>
+                        <p className="text-xs text-text-muted mt-1">Open this site instantly on another device.</p>
+                      </div>
+
+                      <div className="flex items-center space-x-2 bg-[#020617] border border-white/10 rounded-xl p-2 pl-3">
+                        <span className="text-xs font-mono text-text-muted truncate select-all flex-1">
+                          {window.location.href}
+                        </span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(window.location.href);
+                            setIsQrCopied(true);
+                            setTimeout(() => setIsQrCopied(false), 2000);
+                          }}
+                          className="p-2 rounded-lg text-xs font-bold text-white transition-all flex items-center space-x-1 shrink-0"
+                          style={{ background: `linear-gradient(135deg, ${activeTheme.primary}, ${activeTheme.secondary})` }}
+                        >
+                          {isQrCopied ? (
+                            <motion.span initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="flex items-center">
+                              <Check className="w-3.5 h-3.5 mr-0.5" /> Copied!
+                            </motion.span>
+                          ) : (
+                            <span className="flex items-center">Copy Link</span>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Drag Helper */}
+                    <div className="mt-5 text-[10px] text-text-muted flex items-center justify-center font-mono opacity-80" style={{ transform: "translateZ(20px)" }}>
+                      <Move className="w-3 h-3 mr-1 animate-bounce" /> Drag me anywhere. I float in Zero-G!
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
             </div>
           </motion.div>
         )}

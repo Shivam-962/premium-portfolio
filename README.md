@@ -14,6 +14,15 @@ A premium, modern, responsive developer portfolio coupled with a smart resume ta
 
 ## 🛠️ Installation & Setup
 
+### ⚡ Quick Start (Windows One-Click Launch)
+If you are on Windows, you can start both the backend API and the frontend UI servers with a single click:
+1. Double-click the **`start-local.bat`** file in the root directory.
+2. The script will automatically configure your local path, launch the backend on port `5000`, launch the frontend on port `3000`, and open your browser to `http://localhost:3000` after a 5-second initialization delay.
+
+---
+
+### Manual Launch Setup
+
 ### 1. Database Setup
 Ensure you have MySQL running. Create the database and seed it with pre-configured developer profile data:
 ```bash
