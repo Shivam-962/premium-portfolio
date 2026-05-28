@@ -1537,95 +1537,101 @@ export default function App() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 bg-background-sec px-6 relative">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid md:grid-cols-12 gap-12">
-            <div className="md:col-span-5 space-y-6">
-              <div className="inline-flex items-center space-x-2 rounded-xl bg-background-main border border-border-glow p-2 text-xs font-mono text-[var(--accent)]">
-                <span>07. GET IN TOUCH</span>
-              </div>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">Let's collaborate</h2>
-              <div className="space-y-4 pt-6 text-xs text-text-secondary">
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-4 h-4 text-[var(--accent)]" />
-                  <span>shivaartist962@gmail.com</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Briefcase className="w-4 h-4 text-[var(--primary)]" />
-                  <span>+91 91751 41111</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <BookOpen className="w-4 h-4 text-[var(--secondary)]" />
-                  <span>Maharashtra, India</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="md:col-span-7">
-              <form onSubmit={handleContactSubmit} className="glass-panel p-8 rounded-2xl space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted mb-1 font-mono">Your Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={contactName}
-                      onChange={(e) => setContactName(e.target.value)}
-                      className="w-full bg-[#020617] border border-border-glow rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[var(--accent)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted mb-1 font-mono">Your Email</label>
-                    <input
-                      type="email"
-                      required
-                      value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)}
-                      className="w-full bg-[#020617] border border-border-glow rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[var(--accent)]"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-text-muted mb-1 font-mono">Subject</label>
-                  <input
-                    type="text"
-                    value={contactSubject}
-                    onChange={(e) => setContactSubject(e.target.value)}
-                    className="w-full bg-[#020617] border border-border-glow rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[var(--accent)]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-text-muted mb-1 font-mono">Message</label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={contactMessage}
-                    onChange={(e) => setContactMessage(e.target.value)}
-                    className="w-full bg-[#020617] border border-border-glow rounded-xl p-4 text-xs text-white focus:outline-none focus:border-[var(--accent)]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={contactStatus === 'sending'}
-                  className="w-full rounded-xl py-3 text-xs font-bold text-white hover:opacity-90 shadow-md transition-all duration-300 disabled:opacity-50 flex items-center justify-center space-x-2"
-                  style={{
-                    background: `linear-gradient(135deg, ${activeTheme.primary} 0%, ${activeTheme.secondary} 100%)`
-                  }}
-                >
-                  <Send className="w-4 h-4 mr-1 text-[var(--accent)]" />
-                  <span>{contactStatus === 'sending' ? 'Sending...' : 'Send Message'}</span>
-                </button>
-
-                {contactStatus === 'success' && (
-                  <div className="flex items-center space-x-2 text-brand-success text-xs font-mono bg-brand-success bg-opacity-10 p-3 rounded-lg">
-                    <CheckCircle className="w-4 h-4 text-brand-success" />
-                    <span>Inquiry processed successfully. Thank you!</span>
-                  </div>
-                )}
-              </form>
-            </div>
+      <section id="contact" className="py-24 bg-background-sec px-6 relative flex flex-col items-center justify-center">
+        <div className="mx-auto max-w-2xl w-full text-center">
+          <div className="inline-flex items-center space-x-2 rounded-xl bg-background-main border border-border-glow p-2 text-xs font-mono text-[var(--accent)] mb-6">
+            <span>07. GET IN TOUCH</span>
           </div>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight mb-4">Let's collaborate</h2>
+          <p className="text-text-secondary text-sm max-w-md mx-auto mb-10">
+            Feel free to reach out directly through any of the channels below. I am always open to discussing new projects, creative ideas, or opportunities.
+          </p>
+
+          <motion.div
+            whileHover={{ y: -5, boxShadow: `0 10px 40px -10px ${activeTheme.glow}` }}
+            transition={{ duration: 0.3 }}
+            style={{ borderColor: activeTheme.primary }}
+            className="glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 relative overflow-hidden backdrop-blur-xl bg-[#0b0f19]/80 w-full flex flex-col items-center"
+          >
+            {/* Ambient background glow inside the card */}
+            <div className="absolute top-0 right-0 w-32 h-32 rounded-full filter blur-3xl opacity-20 pointer-events-none" style={{ background: activeTheme.primary }} />
+            <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full filter blur-3xl opacity-20 pointer-events-none" style={{ background: activeTheme.secondary }} />
+
+            <div 
+              className="h-16 w-16 rounded-full flex items-center justify-center font-bold text-white text-xl mb-4 shadow-lg"
+              style={{ background: `linear-gradient(135deg, ${activeTheme.primary}, ${activeTheme.secondary})` }}
+            >
+              SJ
+            </div>
+            
+            <h3 className="font-display font-extrabold text-xl text-white">Shivam Jethure</h3>
+            <p className="text-xs font-mono text-[var(--accent)] mt-1">Second Year B.Tech Student</p>
+            <p className="text-xs text-text-muted text-center max-w-sm mt-3 leading-relaxed">
+              G H Raisoni College of Engineering and Management. Passionate about Java, Python, Web Dev, and Vibe Coding.
+            </p>
+
+            <div className="w-full border-t border-border-glow my-6" />
+
+            <div className="grid sm:grid-cols-2 gap-4 w-full text-left">
+              <a 
+                href="mailto:shivaartist962@gmail.com" 
+                className="flex items-center space-x-3 p-4 rounded-2xl bg-[#020617] border border-border-glow hover:border-[var(--primary)] hover:bg-[#0f172a]/40 transition-all duration-300"
+              >
+                <div className="p-2.5 rounded-xl bg-white/5 text-[var(--accent)] shrink-0">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-mono text-text-muted font-bold tracking-wider uppercase">Email Me</p>
+                  <p className="text-xs font-semibold text-white truncate">shivaartist962@gmail.com</p>
+                </div>
+              </a>
+
+              <a 
+                href="tel:+919175141111" 
+                className="flex items-center space-x-3 p-4 rounded-2xl bg-[#020617] border border-border-glow hover:border-[var(--primary)] hover:bg-[#0f172a]/40 transition-all duration-300"
+              >
+                <div className="p-2.5 rounded-xl bg-white/5 text-[var(--primary)] shrink-0">
+                  <Briefcase className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-mono text-text-muted font-bold tracking-wider uppercase">Call/WhatsApp</p>
+                  <p className="text-xs font-semibold text-white truncate">+91 91751 41111</p>
+                </div>
+              </a>
+            </div>
+
+            <div className="flex items-center space-x-3 mt-4 p-4 rounded-2xl bg-[#020617] border border-border-glow w-full">
+              <div className="p-2.5 rounded-xl bg-white/5 text-[var(--secondary)] shrink-0">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-mono text-text-muted font-bold tracking-wider uppercase">Location</p>
+                <p className="text-xs font-semibold text-white">Maharashtra, India</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center space-x-4 mt-8">
+              <a 
+                href="https://github.com/Shivam-962" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-border-glow hover:border-white/20 text-text-muted hover:text-white transition-all text-xs font-semibold font-mono"
+              >
+                <Github className="w-4 h-4" />
+                <span>GitHub</span>
+              </a>
+              <a 
+                href="https://www.linkedin.com/in/shivam-jethure-2320b32b3" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-border-glow hover:border-[#0077b5]/50 text-text-muted hover:text-white transition-all text-xs font-semibold font-mono"
+              >
+                <Briefcase className="w-4 h-4 text-[#0077b5]" />
+                <span>LinkedIn</span>
+              </a>
+            </div>
+
+          </motion.div>
         </div>
       </section>
 
