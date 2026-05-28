@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Atom, Wind, Move, Cpu, Database, Route, Figma, Layers, GitBranch, Cloud, 
-  Download, Send, Lock, User, ExternalLink, Github, Terminal, Sliders, Sparkles, 
-  Plus, Trash2, Eye, BookOpen, Briefcase, Mail, FileText, CheckCircle, 
-  TrendingUp, BarChart2, Check, RefreshCw, X, ChevronUp, AlertCircle, Settings,
-  Edit2, Award, Zap
+  Download, Send, Lock, Github, Terminal, Sliders, Sparkles, 
+  Trash2, Eye, BookOpen, Briefcase, Mail, CheckCircle, 
+  BarChart2, Check, RefreshCw, X, ChevronUp, AlertCircle, Settings,
+  Menu
 } from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 
 // --- Types ---
 interface Project {
@@ -135,6 +135,7 @@ export default function App() {
   const [isDbConnected, setIsDbConnected] = useState<boolean>(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Custom Cursor details
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -653,7 +654,7 @@ export default function App() {
 
       {/* Floating Spotlight overlay linked to coordinate state */}
       <div 
-        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(600px_at_var(--x)_var(--y),var(--glow-color),transparent_70%)] opacity-30"
+        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(600px_at_var(--x)_var(--y),var(--glow-color),transparent_70%)] hidden md:block opacity-30"
         style={{
           ['--x' as any]: `${cursorPos.x}px`,
           ['--y' as any]: `${cursorPos.y}px`
@@ -696,12 +697,54 @@ export default function App() {
             </button>
             <button
               onClick={() => setIsAdminOpen(true)}
-              className="flex items-center space-x-2 rounded-xl border border-border-glow px-4 py-2 text-xs font-semibold text-text-muted hover:border-[var(--secondary)] hover:text-white transition-all duration-300"
+              className="hidden sm:flex items-center space-x-2 rounded-xl border border-border-glow px-4 py-2 text-xs font-semibold text-text-muted hover:border-[var(--secondary)] hover:text-white transition-all duration-300"
             >
               <Lock className="h-3 w-3 mr-1 text-[var(--secondary)]" /> Admin
             </button>
+
+            {/* Hamburger Button (Mobile Only) */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl border border-border-glow text-text-muted hover:text-white hover:border-[var(--primary)] transition-colors md:hidden"
+            >
+              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
           </div>
         </nav>
+
+        {/* Mobile Navigation Dropdown */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden border-t border-[#1E293B] bg-[#0b0f19] overflow-hidden"
+            >
+              <div className="flex flex-col space-y-4 p-6 text-sm font-medium text-text-muted">
+                <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">About</a>
+                <a href="#skills" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">Skills</a>
+                <a href="#projects" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">Projects</a>
+                <a href="#experience" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">Experience</a>
+                <a href="#services" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">Services</a>
+                <a href="#resume" onClick={() => setIsMobileMenuOpen(false)} className="text-[var(--accent)] hover:text-white transition-colors flex items-center space-x-1">
+                  <Sparkles className="w-4 h-4 mr-1 text-[var(--accent)] animate-pulse" /> AI Resume
+                </a>
+                <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-text-primary transition-colors">Contact</a>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsAdminOpen(true);
+                  }}
+                  className="flex items-center space-x-2 rounded-xl border border-border-glow px-4 py-2.5 text-xs font-semibold text-text-muted hover:border-[var(--secondary)] hover:text-white transition-all duration-300 w-full justify-center sm:hidden"
+                >
+                  <Lock className="h-3 w-3 mr-1 text-[var(--secondary)]" /> Admin Panel
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Theme Presets selector Floating Bar */}
@@ -806,7 +849,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-12 flex items-center justify-center space-x-6 text-text-muted print:hidden"
+            className="mt-12 flex flex-wrap items-center justify-center gap-4 text-text-muted print:hidden"
           >
             <a 
               href="https://github.com/shivamjethure" 
@@ -868,16 +911,16 @@ export default function App() {
             {/* Quick Metrics Grid */}
             <div className="grid grid-cols-3 gap-4 pt-6">
               <div className="glass-panel p-4 rounded-2xl text-center group cursor-pointer hover:border-[var(--primary)] transition-all">
-                <span className="font-display text-3xl font-extrabold text-[var(--primary)] group-hover:scale-110 block transform duration-300">5+</span>
+                <span className="font-display text-3xl font-extrabold text-[var(--primary)] group-hover:scale-110 block transform duration-300">0</span>
                 <p className="text-xs text-text-muted mt-1 uppercase tracking-wider font-mono">Years Exp</p>
               </div>
               <div className="glass-panel p-4 rounded-2xl text-center group cursor-pointer hover:border-[var(--secondary)] transition-all">
-                <span className="font-display text-3xl font-extrabold text-[var(--secondary)] group-hover:scale-110 block transform duration-300">15+</span>
-                <p className="text-xs text-text-muted mt-1 uppercase tracking-wider font-mono">Delivered</p>
+                <span className="font-display text-3xl font-extrabold text-[var(--secondary)] group-hover:scale-110 block transform duration-300">3+</span>
+                <p className="text-xs text-text-muted mt-1 uppercase tracking-wider font-mono">Projects Done</p>
               </div>
               <div className="glass-panel p-4 rounded-2xl text-center group cursor-pointer hover:border-[var(--accent)] transition-all">
-                <span className="font-display text-3xl font-extrabold text-[var(--accent)] group-hover:scale-110 block transform duration-300">98%</span>
-                <p className="text-xs text-text-muted mt-1 uppercase tracking-wider font-mono">Success Rate</p>
+                <span className="font-display text-3xl font-extrabold text-[var(--accent)] group-hover:scale-110 block transform duration-300">2nd</span>
+                <p className="text-xs text-text-muted mt-1 uppercase tracking-wider font-mono">Year B.Tech</p>
               </div>
             </div>
           </div>
@@ -898,7 +941,7 @@ export default function App() {
           </div>
 
           {/* Skill Selector Tabs */}
-          <div className="flex justify-center space-x-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-12">
             {(['frontend', 'backend', 'uiux', 'tools'] as const).map((tab) => (
               <button
                 key={tab}
@@ -1278,134 +1321,156 @@ export default function App() {
                 </div>
               )}
 
-              {/* A4 Resume Structure */}
-              <div 
-                className={`w-full shadow-2xl p-8 rounded-xl aspect-[1/1.4] overflow-hidden text-left border ${
-                  resumeTemplate === 'modern_dark' 
-                    ? 'bg-[#0f172a] text-[#f8fafc] border-[#1e293b]' 
-                    : 'bg-white text-black border-gray-300'
-                }`}
-              >
-                {/* Header */}
-                <div className="text-center space-y-1.5 border-b pb-4 border-gray-200">
-                  <h3 
-                    onClick={() => {
-                      setEditingField({ section: 'personal', field: 'name' });
-                      setEditValue(activeResumeContent.personal.name);
-                    }}
-                    className="font-display font-extrabold text-2xl tracking-tight uppercase cursor-pointer hover:bg-yellow-100 hover:text-black rounded px-1 transition-all"
-                    title="Click to edit Name"
-                  >
-                    {activeResumeContent.personal.name}
-                  </h3>
-                  <div className={`text-xs font-semibold ${resumeTemplate === 'modern_dark' ? 'text-[var(--accent)]' : 'text-brand-blue'}`}>
-                    {targetRole}
-                  </div>
-                  <div className="text-[10px] flex justify-center space-x-4 text-gray-500 font-mono">
-                    <span 
-                      onClick={() => {
-                        setEditingField({ section: 'personal', field: 'email' });
-                        setEditValue(activeResumeContent.personal.email);
-                      }}
-                      className="cursor-pointer hover:underline"
-                    >
-                      {activeResumeContent.personal.email}
-                    </span>
-                    <span 
-                      onClick={() => {
-                        setEditingField({ section: 'personal', field: 'phone' });
-                        setEditValue(activeResumeContent.personal.phone);
-                      }}
-                      className="cursor-pointer hover:underline"
-                    >
-                      {activeResumeContent.personal.phone}
-                    </span>
-                    <span 
-                      onClick={() => {
-                        setEditingField({ section: 'personal', field: 'location' });
-                        setEditValue(activeResumeContent.personal.location);
-                      }}
-                      className="cursor-pointer hover:underline"
-                    >
-                      {activeResumeContent.personal.location}
-                    </span>
-                  </div>
+              {/* A4 Resume Structure Container */}
+              <div className="w-full overflow-x-auto pb-4 print:overflow-visible">
+                {/* Swipe Helper Badge (Visible only on Mobile) */}
+                <div className="flex items-center justify-center space-x-2 text-[10px] font-mono text-[var(--accent)] mb-3 md:hidden">
+                  <span>👈 Swipe horizontally to view/edit A4 Resume</span>
                 </div>
 
-                {/* Summary */}
-                <div className="mt-4 space-y-1">
-                  <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Summary</h4>
-                  <p 
-                    onClick={() => {
-                      setEditingField({ section: 'personal', field: 'summary' });
-                      setEditValue(activeResumeContent.personal.summary);
-                    }}
-                    className="text-[10px] leading-relaxed text-gray-600 cursor-pointer hover:bg-yellow-100 hover:text-black rounded p-1 transition-all"
-                    title="Click to edit Summary"
-                  >
-                    {activeResumeContent.personal.summary}
-                  </p>
-                </div>
+                {/* A4 Resume Structure */}
+                <div 
+                  className={`w-full min-w-[720px] md:min-w-0 shadow-2xl p-8 rounded-xl aspect-[1/1.4] overflow-hidden text-left border ${
+                    resumeTemplate === 'modern_dark' 
+                      ? 'bg-[#0f172a] text-[#f8fafc] border-[#1e293b]' 
+                      : 'bg-white text-black border-gray-300'
+                  }`}
+                >
+                  {/* Header */}
+                  <div className="text-center space-y-1.5 border-b pb-4 border-gray-200">
+                    <h3 
+                      onClick={() => {
+                        setEditingField({ section: 'personal', field: 'name' });
+                        setEditValue(activeResumeContent.personal.name);
+                      }}
+                      className="font-display font-extrabold text-2xl tracking-tight uppercase cursor-pointer hover:bg-yellow-100 hover:text-black rounded px-1 transition-all"
+                      title="Click to edit Name"
+                    >
+                      {activeResumeContent.personal.name}
+                    </h3>
+                    <div className={`text-xs font-semibold ${resumeTemplate === 'modern_dark' ? 'text-[var(--accent)]' : 'text-brand-blue'}`}>
+                      {targetRole}
+                    </div>
+                    <div className="text-[10px] flex justify-center space-x-4 text-gray-500 font-mono">
+                      <span 
+                        onClick={() => {
+                          setEditingField({ section: 'personal', field: 'email' });
+                          setEditValue(activeResumeContent.personal.email);
+                        }}
+                        className="cursor-pointer hover:underline"
+                      >
+                        {activeResumeContent.personal.email}
+                      </span>
+                      <span 
+                        onClick={() => {
+                          setEditingField({ section: 'personal', field: 'phone' });
+                          setEditValue(activeResumeContent.personal.phone);
+                        }}
+                        className="cursor-pointer hover:underline"
+                      >
+                        {activeResumeContent.personal.phone}
+                      </span>
+                      <span 
+                        onClick={() => {
+                          setEditingField({ section: 'personal', field: 'location' });
+                          setEditValue(activeResumeContent.personal.location);
+                        }}
+                        className="cursor-pointer hover:underline"
+                      >
+                        {activeResumeContent.personal.location}
+                      </span>
+                    </div>
+                  </div>
 
-                {/* Skills */}
-                <div className="mt-4 space-y-1">
-                  <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Technical Competencies</h4>
-                  <div className="grid grid-cols-12 gap-2 text-[10px]">
-                    {Object.keys(activeResumeContent.skills).map((cat) => (
-                      <div key={cat} className="col-span-4">
-                        <span className="font-bold">{cat}:</span>
-                        <div className="text-gray-500">{activeResumeContent.skills[cat].join(', ')}</div>
+                  {/* Summary */}
+                  <div className="mt-4 space-y-1">
+                    <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Summary</h4>
+                    <p 
+                      onClick={() => {
+                        setEditingField({ section: 'personal', field: 'summary' });
+                        setEditValue(activeResumeContent.personal.summary);
+                      }}
+                      className="text-[10px] text-gray-500 leading-relaxed cursor-pointer hover:bg-yellow-100 hover:text-black rounded px-1 transition-all"
+                      title="Click to edit Summary"
+                    >
+                      {activeResumeContent.personal.summary}
+                    </p>
+                  </div>
+
+                  {/* Education */}
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Education</h4>
+                    {activeResumeContent.education.map((edu: any, i: number) => (
+                      <div key={i} className="flex justify-between text-[10px]">
+                        <div>
+                          <span className="font-bold">{edu.degree}</span>
+                          <span className="text-gray-500"> — {edu.institution}</span>
+                        </div>
+                        <span className="font-mono text-gray-500">{edu.year}</span>
                       </div>
                     ))}
                   </div>
-                </div>
 
-                {/* Experience */}
-                <div className="mt-4 space-y-2">
-                  <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Work Experience</h4>
-                  {activeResumeContent.experience.map((exp: any, i: number) => (
-                    <div key={i} className="space-y-1">
-                      <div className="flex justify-between text-[10px] font-bold">
-                        <span 
-                          onClick={() => {
-                            setEditingField({ section: 'experience', field: 'role', index: i });
-                            setEditValue(exp.role);
-                          }}
-                          className="cursor-pointer hover:underline"
-                        >
-                          {exp.role} — {exp.company}
-                        </span>
-                        <span className="font-mono text-gray-500">{exp.period}</span>
-                      </div>
-                      <ul className="list-disc pl-4 text-[10px] text-gray-600 space-y-0.5">
-                        {exp.bullets.map((bullet: string, idx: number) => (
-                          <li key={idx}>{bullet}</li>
-                        ))}
-                      </ul>
+                  {/* Skills */}
+                  <div className="mt-4 space-y-1">
+                    <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Technical Competencies</h4>
+                    <div className="grid grid-cols-12 gap-2 text-[10px]">
+                      {Object.keys(activeResumeContent.skills).map((cat) => (
+                        <div key={cat} className="col-span-4">
+                          <span className="font-bold">{cat}:</span>
+                          <div className="text-gray-500">{activeResumeContent.skills[cat].join(', ')}</div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                {/* Projects */}
-                <div className="mt-4 space-y-2">
-                  <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Key Projects</h4>
-                  {activeResumeContent.projects.map((proj: any, i: number) => (
-                    <div key={i} className="text-[10px]">
-                      <div className="flex justify-between font-bold">
-                        <span 
-                          onClick={() => {
-                            setEditingField({ section: 'projects', field: 'title', index: i });
-                            setEditValue(proj.title);
-                          }}
-                          className="cursor-pointer hover:underline"
-                        >
-                          {proj.title}
-                        </span>
-                        <span className="font-mono text-gray-500 font-normal">{proj.tech}</span>
+                  {/* Experience */}
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Experience</h4>
+                    {activeResumeContent.experience.map((exp: any, i: number) => (
+                      <div key={i} className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span 
+                            onClick={() => {
+                              setEditingField({ section: 'experience', field: 'role', index: i });
+                              setEditValue(exp.role);
+                            }}
+                            className="cursor-pointer hover:underline"
+                          >
+                            {exp.role} — {exp.company}
+                          </span>
+                          <span className="font-mono text-gray-500">{exp.period}</span>
+                        </div>
+                        <ul className="list-disc pl-4 text-[10px] text-gray-600 space-y-0.5">
+                          {exp.bullets.map((bullet: string, idx: number) => (
+                            <li key={idx}>{bullet}</li>
+                          ))}
+                        </ul>
                       </div>
-                      <p className="text-gray-600">{proj.description}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+
+                  {/* Projects */}
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-xs uppercase font-mono font-bold border-b pb-0.5 border-gray-200">Key Projects</h4>
+                    {activeResumeContent.projects.map((proj: any, i: number) => (
+                      <div key={i} className="text-[10px]">
+                        <div className="flex justify-between font-bold">
+                          <span 
+                            onClick={() => {
+                              setEditingField({ section: 'projects', field: 'title', index: i });
+                              setEditValue(proj.title);
+                            }}
+                            className="cursor-pointer hover:underline"
+                          >
+                            {proj.title}
+                          </span>
+                          <span className="font-mono text-gray-500 font-normal">{proj.tech}</span>
+                        </div>
+                        <p className="text-gray-600">{proj.description}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1424,7 +1489,7 @@ export default function App() {
 
         <div className="grid md:grid-cols-2 gap-8">
           {[
-            { name: 'Sarah Jenkins', role: 'CTO, BillFlow ERP', text: 'Alex brought an exceptional eye for premium SaaS aesthetics. The frontend dashboard he created is beautiful, fast, and has optimized onboarding times dramatically.' },
+            { name: 'Sarah Jenkins', role: 'CTO, BillFlow ERP', text: 'Shivam brought an exceptional eye for premium SaaS aesthetics. The frontend dashboard he created is beautiful, fast, and has optimized onboarding times dramatically.' },
             { name: 'Marcus Chen', role: 'Founder, Cognitive Copilot', text: 'Outstanding execution. The canvas builder and file exporting systems are robust, clean, and delivered perfectly within deadline requirements.' }
           ].map((t, idx) => (
             <div key={idx} className="glass-panel p-8 rounded-2xl border-border-glow hover:border-[var(--secondary)] transition-all">
@@ -1543,7 +1608,7 @@ export default function App() {
       <footer className="border-t border-[#1E293B] py-12 px-6 bg-background-main">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between text-xs text-text-muted">
           <div>
-            <span>© {new Date().getFullYear()} Alex Morgan. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Shivam Jethure. All rights reserved.</span>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
