@@ -40,7 +40,7 @@ exports.sendMessage = async (req, res) => {
       try {
         await transporter.sendMail({
           from: process.env.SMTP_FROM || 'noreply@premiumportfolio.local',
-          to: process.env.SMTP_USER, // Send it to yourself
+          to: process.env.OWNER_EMAIL || process.env.SMTP_USER || 'shivaartist962@gmail.com', // Send to owner
           replyTo: email,
           subject: `Portfolio Contact: ${subject}`,
           text: `You received a new message from ${name} (${email}):\n\n${message}`,
@@ -53,9 +53,72 @@ exports.sendMessage = async (req, res) => {
             </div>
           </div>`
         });
+        console.log(`📧 Notification email successfully sent to ${process.env.OWNER_EMAIL || process.env.SMTP_USER || 'shivaartist962@gmail.com'}`);
       } catch (err) {
         console.error('Failed to dispatch contact alert email:', err.message);
       }
+    }
+
+    // Dispatch SMS alert to portfolio owner via Twilio, Fast2SMS, or Mock console logging
+    const toPhone = process.env.OWNER_PHONE || '+919175141111';
+    let smsSent = false;
+    let smsMethod = 'none';
+
+    try {
+      const twilioSid = process.env.TWILIO_ACCOUNT_SID;
+      const twilioToken = process.env.TWILIO_AUTH_TOKEN;
+      const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
+      const fast2smsKey = process.env.FAST2SMS_API_KEY;
+      const smsText = `Portfolio inquiry from ${name} (${email}): ${subject}. Msg: ${message.substring(0, 100)}`;
+
+      if (twilioSid && twilioToken && twilioPhone) {
+        const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
+        const auth = Buffer.from(`${twilioSid}:${twilioToken}`).toString('base64');
+        const params = new URLSearchParams();
+        params.append('To', toPhone);
+        params.append('From', twilioPhone);
+        params.append('Body', smsText);
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: params.toString()
+        });
+
+        if (response.ok) {
+          smsSent = true;
+          smsMethod = 'Twilio';
+          console.log(`📱 Twilio SMS alert sent successfully to ${toPhone}`);
+        } else {
+          const errData = await response.json();
+          console.error('Twilio SMS sending failed:', errData);
+        }
+      } else if (fast2smsKey) {
+        const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${fast2smsKey}&route=q&message=${encodeURIComponent(smsText.substring(0, 120))}&language=english&flash=0&numbers=${toPhone.replace('+', '')}`;
+        const response = await fetch(url);
+        
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData.return) {
+            smsSent = true;
+            smsMethod = 'Fast2SMS';
+            console.log(`📱 Fast2SMS alert sent successfully to ${toPhone}`);
+          } else {
+            console.error('Fast2SMS returned error:', resData);
+          }
+        } else {
+          console.error('Fast2SMS HTTP request failed');
+        }
+      }
+
+      if (!smsSent) {
+        console.log(`\n📱 [MOCK SMS ALERT SENT TO ${toPhone}]:\nContent: ${smsText}\n`);
+      }
+    } catch (smsErr) {
+      console.error('SMS notification error:', smsErr.message);
     }
 
     res.json({
